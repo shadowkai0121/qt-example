@@ -31,7 +31,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # 利用屬性儲存 id 而不顯示在畫面上
         list_item.id = id
         list_item = self.set_list_item_strike_out(list_item, is_done)
-        self.ui.todo_list.addItem(list_item)
+        return list_item
 
     def set_todo_list(self):
         self.ui.todo_list.clear()
@@ -41,7 +41,8 @@ class MainWindow(QtWidgets.QMainWindow):
             id = self.todo_list.record(i).value('id')
             todo = self.todo_list.record(i).value('todo')
             is_done = bool(self.todo_list.record(i).value('is_done'))
-            self.create_todo_list_item(id, todo, is_done)
+            list_item = self.create_todo_list_item(id, todo, is_done)
+            self.ui.todo_list.addItem(list_item)
 
     def delete_todo(self):
         item = self.ui.todo_list.currentItem()
@@ -84,7 +85,8 @@ class MainWindow(QtWidgets.QMainWindow):
         query.bindValue(':is_done', False)
         result = query.exec()
         if result:
-            self.set_todo_list()
+            item = self.create_todo_list_item(query.lastInsertId(), todo, False)
+            self.ui.todo_list.addItem(item)
 
     def connect_database(self):
         connection = QSqlDatabase.addDatabase('QSQLITE')
