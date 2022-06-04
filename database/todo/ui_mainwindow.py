@@ -37,7 +37,6 @@ class Ui_MainWindow(object):
         self.create_button.setGeometry(QRect(300, 10, 131, 31))
         self.create_button.setFont(font)
         self.todo_list = QListWidget(self.centralwidget)
-        QListWidgetItem(self.todo_list)
         self.todo_list.setObjectName(u"todo_list")
         self.todo_list.setGeometry(QRect(20, 60, 411, 231))
         self.horizontalLayoutWidget = QWidget(self.centralwidget)
@@ -61,7 +60,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 450, 22))
+        self.menubar.setGeometry(QRect(0, 0, 450, 21))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
@@ -75,13 +74,6 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
         self.create_button.setText(QCoreApplication.translate("MainWindow", u"Create", None))
-
-        __sortingEnabled = self.todo_list.isSortingEnabled()
-        self.todo_list.setSortingEnabled(False)
-        ___qlistwidgetitem = self.todo_list.item(0)
-        ___qlistwidgetitem.setText(QCoreApplication.translate("MainWindow", u"todo ....", None));
-        self.todo_list.setSortingEnabled(__sortingEnabled)
-
         self.delete_button.setText(QCoreApplication.translate("MainWindow", u"Delete", None))
         self.done_button.setText(QCoreApplication.translate("MainWindow", u"Done", None))
     # retranslateUi
