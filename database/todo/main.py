@@ -1,7 +1,7 @@
 import sys
 from PySide6 import QtWidgets
 from PySide6.QtCore import QDir
-from PySide6.QtSql import QSqlDatabase, QSqlQueryModel
+from PySide6.QtSql import QSqlDatabase, QSqlQueryModel, QSqlQuery
 from ui_mainwindow import Ui_MainWindow
 
 
@@ -19,7 +19,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.create_button.released.connect(self.create_todo)
         self.ui.done_button.released.connect(self.done_todo)
         self.ui.delete_button.released.connect(self.delete_todo)
-    
+
+    def create_todo_list_item(self, content, is_done):
+        list_item = QtWidgets.QListWidgetItem(content)
+        font = list_item.font()
+        font.setStrikeOut(is_done)
+        list_item.setFont(font)
+        self.ui.todo_list.addItem(list_item)
+
     def set_todo_list(self):
         self.ui.todo_list.clear()
         self.todo_list = QSqlQueryModel()
@@ -28,9 +35,7 @@ class MainWindow(QtWidgets.QMainWindow):
             id = self.todo_list.record(i).value('id')
             todo = self.todo_list.record(i).value('todo')
             is_done = bool(self.todo_list.record(i).value('is_done'))
-            list_item = QtWidgets.QListWidgetItem(f'[{id}] {todo} ({is_done})')
-            self.ui.todo_list.addItem(list_item)
-
+            self.create_todo_list_item(f'[{id}] {todo}', is_done)
 
     def delete_todo(self):
         # 測試按鈕功能
@@ -43,7 +48,17 @@ class MainWindow(QtWidgets.QMainWindow):
     def create_todo(self):
         # 取得輸入框資料
         todo = self.ui.create_todo_text_edit.text()
-        self.ui.todo_list.addItem(todo)
+
+        query = QSqlQuery()
+        sql = '''
+        INSERT INTO todo_list(todo, is_done) VALUES (:todo, :is_done)
+        '''
+        query.prepare(sql)
+        query.bindValue(':todo', todo)
+        query.bindValue(':is_done', False)
+        result = query.exec()
+        if result:
+            self.set_todo_list()
 
     def connect_database(self):
         connection = QSqlDatabase.addDatabase('QSQLITE')
