@@ -19,14 +19,18 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.create_button.released.connect(self.create_todo)
         self.ui.done_button.released.connect(self.done_todo)
         self.ui.delete_button.released.connect(self.delete_todo)
+    
+    def set_list_item_strike_out(self, list_item: QtWidgets.QListWidgetItem, is_done: bool) -> QtWidgets.QListWidgetItem:
+        font = list_item.font()
+        font.setStrikeOut(is_done)
+        list_item.setFont(font)
+        return list_item
 
     def create_todo_list_item(self, id: int, todo:str , is_done: bool):
         list_item = QtWidgets.QListWidgetItem(todo)
         # 利用屬性儲存 id 而不顯示在畫面上
         list_item.id = id
-        font = list_item.font()
-        font.setStrikeOut(is_done)
-        list_item.setFont(font)
+        list_item = self.set_list_item_strike_out(list_item, is_done)
         self.ui.todo_list.addItem(list_item)
 
     def set_todo_list(self):
@@ -53,8 +57,19 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.todo_list.takeItem(row)
 
     def done_todo(self):
-        # 測試按鈕功能
-        self.ui.create_todo_text_edit.setText('done todo')
+        item = self.ui.todo_list.currentItem()
+        query = QSqlQuery()
+        sql = '''
+        UPDATE todo_list SET is_done = :is_done WHERE id = :id
+        '''
+        query.prepare(sql)
+        query.bindValue(':id', item.id)
+        query.bindValue(':is_done', True)
+        result = query.exec()
+        if result:
+            # Pass by Assignment 直接修改 item
+            self.set_list_item_strike_out(item, True)
+
 
     def create_todo(self):
         # 取得輸入框資料
