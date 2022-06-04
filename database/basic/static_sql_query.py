@@ -22,9 +22,10 @@ CREATE TABLE todo_list (
 query = QSqlQuery()
 result = query.exec(create_table_sql)
 
-# table 重複的狀況會回傳 False，但是不算 Error
+# table 重複的狀況會回傳 False
 print(f'create table result: {result}')
 if not result:
-    print(f'Database Error: {connection.lastError().databaseText()}')
+    print(f'Database Error: {query.lastError().databaseText()}')
+    # Database Error: table todo_list already exists
     sys.exit(1)
 
