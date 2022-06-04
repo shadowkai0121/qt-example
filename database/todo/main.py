@@ -20,8 +20,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.done_button.released.connect(self.done_todo)
         self.ui.delete_button.released.connect(self.delete_todo)
 
-    def create_todo_list_item(self, content, is_done):
-        list_item = QtWidgets.QListWidgetItem(content)
+    def create_todo_list_item(self, id: int, todo:str , is_done: bool):
+        list_item = QtWidgets.QListWidgetItem(todo)
+        # 利用屬性儲存 id 而不顯示在畫面上
+        list_item.id = id
         font = list_item.font()
         font.setStrikeOut(is_done)
         list_item.setFont(font)
@@ -35,11 +37,20 @@ class MainWindow(QtWidgets.QMainWindow):
             id = self.todo_list.record(i).value('id')
             todo = self.todo_list.record(i).value('todo')
             is_done = bool(self.todo_list.record(i).value('is_done'))
-            self.create_todo_list_item(f'[{id}] {todo}', is_done)
+            self.create_todo_list_item(id, todo, is_done)
 
     def delete_todo(self):
-        # 測試按鈕功能
-        self.ui.create_todo_text_edit.setText('delete todo')
+        item = self.ui.todo_list.currentItem()
+        query = QSqlQuery()
+        sql = '''
+        DELETE FROM todo_list WHERE id = :id
+        '''
+        query.prepare(sql)
+        query.bindValue(':id', item.id)
+        result = query.exec()
+        if result:
+            row = self.ui.todo_list.currentRow()
+            self.ui.todo_list.takeItem(row)
 
     def done_todo(self):
         # 測試按鈕功能
